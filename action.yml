@@ -36,6 +36,12 @@ inputs:
     default: "11.5a"
   love-patch:
     description: |
+      Git patch file path for the love repo
+      The patch must start from `love-ref`
+      You can use `git diff` to get the patch file
+    required: false
+  android-patch:
+    description: |
       Git patch file path for the love-android repo
       The patch must start from `love-ref`
       You can use `git diff` to get the patch file
@@ -144,11 +150,18 @@ runs:
         submodules: recursive
         path: ${{ inputs.love-actions-folder }}/love-android
     - name: Apply love-android patch
+      if: "${{ inputs.android-patch != '' }}"
+      shell: bash
+      run: |
+        cp ${{ inputs.android-patch }} ${{ inputs.love-actions-folder }}/love-android/android.patch
+        cd ${{ inputs.love-actions-folder }}/love-android
+        git apply ./android.patch
+    - name: Apply love patch
       if: "${{ inputs.love-patch != '' }}"
       shell: bash
       run: |
-        cp ${{ inputs.love-patch }} ${{ inputs.love-actions-folder }}/love-android/love.patch
-        cd ${{ inputs.love-actions-folder }}/love-android
+        cp ${{ inputs.love-patch }} ${{ inputs.love-actions-folder }}/love-android//love/src/jni/love/love.patch
+        cd ${{ inputs.love-actions-folder }}/love-android/love/src/jni/love
         git apply ./love.patch
     - name: Copy resources
       shell: bash
