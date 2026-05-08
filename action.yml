@@ -269,7 +269,7 @@ runs:
       run: |
         echo "${{ inputs.keystore-base64 }}" | base64 -d > ${{ inputs.love-actions-folder }}/love-android/app/android.keystore
     - name: Build package (Release)
-      uses: burrunan/gradle-cache-action@v2
+      uses: burrunan/gradle-cache-action@v3
       if: "${{ inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
       with:
         arguments: assembleEmbedRecordRelease
