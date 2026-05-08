@@ -22,6 +22,11 @@ inputs:
       Would copy all contents to app/src/main/res
       Top folder not included
     required: true
+  build-debug:
+    description: |
+      Whether to build the debug APK or not
+    required: false
+    default: "true"
   icon-specifier:
     description: |
       Icon specifier
@@ -253,6 +258,7 @@ runs:
         key: ndk-25.2.9519653
     - name: Build package (Debug)
       uses: burrunan/gradle-cache-action@v3
+      if: "${{ inputs.build-debug == 'true' }}"
       with:
         arguments: assembleEmbedRecordDebug
         build-root-directory: ${{ inputs.love-actions-folder }}/love-android
@@ -260,6 +266,7 @@ runs:
         gradle-build-scan-report: false
         gradle-distribution-sha-256-sum-warning: false
     - name: Rename package (Debug)
+      if: "${{ inputs.build-debug == 'true' }}"
       shell: bash
       run: |
         mv ${{ inputs.love-actions-folder }}/love-android/app/build/outputs/apk/embedRecord/debug/app-embed-record-debug.apk ${{ inputs.output-folder }}/${{ inputs.product-name }}-debug.apk
