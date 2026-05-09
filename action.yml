@@ -320,7 +320,7 @@ runs:
     - name: Rename package (release AAB)
       if: "${{ inputs.build-release-aab == 'true' && inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
       shell: bash
-      run: mv ${{ inputs.love-actions-folder }}/love-android/app/build/outputs/bundle/embedNoRecordRelease/app-embed-no-record-release.aab ${{ inputs.output-folder }}/${{ inputs.product-name }}-release.aab
+      run: mv ${{ inputs.love-actions-folder }}/love-android/app/build/outputs/bundle/embedNoRecordRelease/app-embed-noRecord-release.aab ${{ inputs.output-folder }}/${{ inputs.product-name }}-release.aab
 
     - name: Gather packages in output folder
       id: gather-packages
