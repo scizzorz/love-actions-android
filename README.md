@@ -13,7 +13,7 @@ For the `11.4` version, please refer to the [**11.4**](https://github.com/love-a
 
 ## About
 
-Github Action for building & deploying Android `.apk` and `.abb` packages of a [LÖVE](https://love2d.org/) framework based game.
+Github Action for building & deploying Android `.apk` and `.aab` packages of a [LÖVE](https://love2d.org/) framework based game.
 
 ### Related actions
 
