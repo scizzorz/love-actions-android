@@ -22,9 +22,19 @@ inputs:
       Would copy all contents to app/src/main/res
       Top folder not included
     required: true
-  build-debug:
+  build-debug-apk:
     description: |
       Whether to build the debug APK or not
+    required: false
+    default: "true"
+  build-release-apk:
+    description: |
+      Whether to build the release APK or not
+    required: false
+    default: "true"
+  build-release-aab:
+    description: |
+      Whether to build the release bundle or not
     required: false
     default: "true"
   icon-specifier:
@@ -256,28 +266,30 @@ runs:
       with:
         path: /usr/local/lib/android/sdk/ndk/25.2.9519653
         key: ndk-25.2.9519653
-    - name: Build package (Debug)
+
+    - name: Build package (debug APK)
       uses: burrunan/gradle-cache-action@v3
-      if: "${{ inputs.build-debug == 'true' }}"
+      if: "${{ inputs.build-debug-apk == 'true' }}"
       with:
         arguments: assembleEmbedRecordDebug
         build-root-directory: ${{ inputs.love-actions-folder }}/love-android
         concurrent: true
         gradle-build-scan-report: false
         gradle-distribution-sha-256-sum-warning: false
-    - name: Rename package (Debug)
-      if: "${{ inputs.build-debug == 'true' }}"
+    - name: Rename package (debug APK)
+      if: "${{ inputs.build-debug-apk == 'true' }}"
       shell: bash
       run: |
         mv ${{ inputs.love-actions-folder }}/love-android/app/build/outputs/apk/embedRecord/debug/app-embed-record-debug.apk ${{ inputs.output-folder }}/${{ inputs.product-name }}-debug.apk
-    - name: Pre build (Release)
-      if: "${{ inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
+
+    - name: Pre build (release APK)
+      if: "${{ inputs.build-release-apk == 'true' && inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
       shell: bash
       run: |
         echo "${{ inputs.keystore-base64 }}" | base64 -d > ${{ inputs.love-actions-folder }}/love-android/app/android.keystore
-    - name: Build package (Release)
+    - name: Build package (release APK)
       uses: burrunan/gradle-cache-action@v3
-      if: "${{ inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
+      if: "${{ inputs.build-release-apk == 'true' && inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
       with:
         arguments: assembleEmbedRecordRelease
         build-root-directory: ${{ inputs.love-actions-folder }}/love-android
@@ -285,10 +297,31 @@ runs:
         gradle-build-scan-report: false
         gradle-distribution-sha-256-sum-warning: false
         execution-only-caches: true
-    - name: Rename package (Release)
-      if: "${{ inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
+    - name: Rename package (release APK)
+      if: "${{ inputs.build-release-apk == 'true' && inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
       shell: bash
       run: mv ${{ inputs.love-actions-folder }}/love-android/app/build/outputs/apk/embedRecord/release/app-embed-record-release.apk ${{ inputs.output-folder }}/${{ inputs.product-name }}-release.apk
+
+    - name: Pre build (release AAB)
+      if: "${{ inputs.build-release-aab == 'true' && inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
+      shell: bash
+      run: |
+        echo "${{ inputs.keystore-base64 }}" | base64 -d > ${{ inputs.love-actions-folder }}/love-android/app/android.keystore
+    - name: Build package (release AAB)
+      uses: burrunan/gradle-cache-action@v3
+      if: "${{ inputs.build-release-aab == 'true' && inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
+      with:
+        arguments: bundleEmbedRecordRelease
+        build-root-directory: ${{ inputs.love-actions-folder }}/love-android
+        concurrent: true
+        gradle-build-scan-report: false
+        gradle-distribution-sha-256-sum-warning: false
+        execution-only-caches: true
+    - name: Rename package (release AAB)
+      if: "${{ inputs.build-release-aab == 'true' && inputs.keystore-alias != '' && inputs.keystore-base64 != '' && inputs.keystore-key-password != '' && inputs.keystore-store-password != '' }}"
+      shell: bash
+      run: mv ${{ inputs.love-actions-folder }}/love-android/app/build/outputs/bundle/embedRecordRelease/app-embed-record-release.aab ${{ inputs.output-folder }}/${{ inputs.product-name }}-release.aab
+
     - name: Gather packages in output folder
       id: gather-packages
       shell: bash
